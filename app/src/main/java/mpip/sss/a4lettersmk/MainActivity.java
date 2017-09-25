@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Scanner s = new Scanner(getResources().openRawResource(R.raw.words));
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<String>();
 
         try {
             while (s.hasNextLine()) {
