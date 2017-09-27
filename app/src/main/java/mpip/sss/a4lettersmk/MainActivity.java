@@ -2,6 +2,7 @@ package mpip.sss.a4lettersmk;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,19 +19,38 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static boolean RUN_ONCE = true;
+    private static final String PREFS="highscores_pref";
     private long timeCountInMilliSeconds;
-
-
     private ProgressBar barTimer;
     private CountDownTimer countDownTimer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button btn_scores=(Button) findViewById(R.id.scores);
+        Button btn_highscores=(Button) findViewById(R.id.highscores);
+
+        SharedPreferences sp=getSharedPreferences(PREFS, 0);
+        String highscores_str=sp.getString("highscores_str", "0");
+        btn_highscores.setText(highscores_str);
+
+
+        if(RUN_ONCE){
+            btn_scores.setText("0");
+        }
+        else{
+            btn_scores.setText(getIntent().getExtras().getString("scores_str"));
+        }
+
+
+        runOnce();
+
         Scanner s = new Scanner(getResources().openRawResource(R.raw.words));
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
 
         try {
             while (s.hasNextLine()) {
@@ -44,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         char [] letters=line.toCharArray();
         Arrays.sort(letters);
         String newWord=new String(letters);
+        
         final String l3=String.valueOf(newWord.charAt(0));
         final String l2=String.valueOf(newWord.charAt(1));
         final String l4=String.valueOf(newWord.charAt(2));
@@ -51,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+ 
         final Button button1 = (Button) findViewById(R.id.button1);
         final Button button2 = (Button) findViewById(R.id.button2);
         final Button button3 = (Button) findViewById(R.id.button3);
@@ -70,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         barTimer = (ProgressBar) findViewById(R.id.barTimer);
 
-        timeCountInMilliSeconds = 8000;
+        timeCountInMilliSeconds = 10000;
         setProgressBarValues();
         startCountDownTimer();
 
@@ -80,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
         //za kopcinjata vo krugot funkcii
         //-----------------------------------------------------------------------------
+
+
         button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Button b1 = (Button) findViewById(R.id.btn1);
@@ -382,13 +405,26 @@ public class MainActivity extends AppCompatActivity {
                 if (highscores < scores) {
                     highscores = scores;
                     btn_highscores.setText(String.valueOf(highscores));
+                    SharedPreferences highscores_pref=getSharedPreferences(PREFS, 0);
+                    SharedPreferences.Editor editor=highscores_pref.edit();
+                    editor.putString("highscores_str", String.valueOf(highscores));
+                    editor.commit();
                     Intent i=new Intent(getApplicationContext(),MainActivity.class);
+                    i.putExtra("scores_str", String.valueOf(scores));
                     startActivity(i);
                 }
+                Intent i=new Intent(getApplicationContext(),MainActivity.class);
+                i.putExtra("scores_str", String.valueOf(scores));
+                startActivity(i);
             }
         }
         }
 
+    private void runOnce(){
+        if(RUN_ONCE){
+            RUN_ONCE=false;
+        }
+    }
 
 
     public void startCountDownTimer() {
@@ -404,10 +440,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 setProgressBarValues();
+                 Button bu1= (Button)findViewById(R.id.button1);
+                Button bu2= (Button)findViewById(R.id.button2);
+                Button bu3= (Button)findViewById(R.id.button3);
+                Button bu4= (Button)findViewById(R.id.button4);
+
+                bu1.setEnabled(false);
+                bu2.setEnabled(false);
+                bu3.setEnabled(false);
+                bu4.setEnabled(false);
+
+
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage("Изгубивте!").setPositiveButton("OK" ,new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        MainActivity.this.finishAffinity();
+                        RUN_ONCE=true;
+                        Intent i=new Intent(getApplicationContext(),StartActivity.class);
+                        startActivity(i);
                     }}).show();
 
             }
@@ -423,17 +472,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage("Дали сте сигурни дека сакате да излезете?")
-                .setCancelable(false)
-                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        MainActivity.this.finishAffinity();
-                    }
-                })
-                .setNegativeButton("Не", null)
-                .show();
+    public void onBackPressed(){
+        RUN_ONCE=true;
+        Intent i=new Intent(getApplicationContext(),StartActivity.class);
+        startActivity(i);
     }
 
 
