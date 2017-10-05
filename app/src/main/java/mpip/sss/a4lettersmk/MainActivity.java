@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private long timeCountInMilliSeconds;
     private ProgressBar barTimer;
     private CountDownTimer countDownTimer;
+    private String line;
 
 
     @Override
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             s.close();
         }
 
-        String line=list.get(new Random().nextInt(list.size()));
+        line=list.get(new Random().nextInt(list.size()));
         char [] letters=line.toCharArray();
         Arrays.sort(letters);
         String newWord=new String(letters);
@@ -400,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
         while(s.hasNext()) {
             String line=s.next();
             if(line.equals(word)) {
-                scores += 5;
+                scores += 1;
                 btn_scores.setText(String.valueOf(scores));
                 if (highscores < scores) {
                     highscores = scores;
@@ -440,19 +441,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 setProgressBarValues();
-                 Button bu1= (Button)findViewById(R.id.button1);
+                Button bu1= (Button)findViewById(R.id.button1);
                 Button bu2= (Button)findViewById(R.id.button2);
                 Button bu3= (Button)findViewById(R.id.button3);
                 Button bu4= (Button)findViewById(R.id.button4);
+
+                Button buu1= (Button)findViewById(R.id.btn1);
+                Button buu2= (Button)findViewById(R.id.btn2);
+                Button buu3= (Button)findViewById(R.id.btn3);
+                Button buu4= (Button)findViewById(R.id.btn4);
 
                 bu1.setEnabled(false);
                 bu2.setEnabled(false);
                 bu3.setEnabled(false);
                 bu4.setEnabled(false);
 
+                buu1.setEnabled(false);
+                buu2.setEnabled(false);
+                buu3.setEnabled(false);
+                buu4.setEnabled(false);
+
 
                 new AlertDialog.Builder(MainActivity.this)
-                        .setMessage("Изгубивте!").setPositiveButton("OK" ,new DialogInterface.OnClickListener() {
+                        .setMessage("Можно решение: " +line.toUpperCase() + "\nИзгубивте!")
+                        .setPositiveButton("OK" ,new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         RUN_ONCE=true;
                         Intent i=new Intent(getApplicationContext(),StartActivity.class);
